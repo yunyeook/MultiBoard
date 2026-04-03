@@ -63,7 +63,7 @@ public class BoardController {
 		}
 		
 		int totalPageBlock = (int)(Math.ceil(totalPage/10.0));
-		int nowPageBlock = (int)Math.ceil(page/10/0);
+		int nowPageBlock = (int)Math.ceil(page/10.0);
 		int startPage = (nowPageBlock-1)*10+1;
 		int endPage = 0;
 		if(totalPage > nowPageBlock*10) {
@@ -270,21 +270,35 @@ public class BoardController {
 		}
 	}
 
-	@RequestMapping("/board/search/{page}")
+	@GetMapping("/board/search/{page}")
 	public String search(@RequestParam(required=false, defaultValue="") String keyword, @PathVariable int page, HttpSession session, Model model) {
 		try {
 			List<Board> boardList = boardService.searchListByContentKeyword(keyword, page);
 			model.addAttribute("boardList", boardList);
+			
 			int bbsCount = boardService.selectTotalArticleCountByKeyword(keyword);
 			int totalPage = 0;
-
 			if(bbsCount > 0) {
 				totalPage= (int)Math.ceil(bbsCount/10.0);
 			}
-			model.addAttribute("totalPageCount", totalPage);
-			model.addAttribute("page", page);
+			
+			int totalPageBlock = (int)(Math.ceil(totalPage/10.0));
+			int nowPageBlock = (int)Math.ceil(page/10.0);
+			int startPage = (nowPageBlock-1)*10+1;
+			int endPage = 0;
+			if(totalPage > nowPageBlock*10) {
+				endPage = nowPageBlock*10;
+			}else {
+				endPage = totalPage;
+			}
+			
 			model.addAttribute("keyword", keyword);
-			logger.info(totalPage + ":" + page + ":" + keyword);
+			model.addAttribute("totalPageCount", totalPage);
+			model.addAttribute("nowPage", page);
+			model.addAttribute("totalPageBlock", totalPageBlock);
+			model.addAttribute("nowPageBlock", nowPageBlock);
+			model.addAttribute("startPage", startPage);
+			model.addAttribute("endPage", endPage);
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
