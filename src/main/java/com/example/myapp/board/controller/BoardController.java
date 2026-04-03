@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
+import com.example.myapp.MyappApplication;
 import com.example.myapp.board.model.Board;
 import com.example.myapp.board.model.BoardCategory;
 import com.example.myapp.board.model.BoardUploadFile;
@@ -34,6 +34,8 @@ import com.example.myapp.board.service.IBoardService;
 
 @Controller
 public class BoardController {
+
+    private final MyappApplication myappApplication;
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
@@ -41,20 +43,41 @@ public class BoardController {
 	
 	@Autowired
 	IBoardCategoryService categoryService;
+
+    BoardController(MyappApplication myappApplication) {
+        this.myappApplication = myappApplication;
+    }
 		
-	@RequestMapping("/board/cat/{categoryId}/{page}")
+	@GetMapping("/board/cat/{categoryId}/{page}")
 	public String getListByCategory(@PathVariable int categoryId, @PathVariable int page, HttpSession session, Model model) {
 		session.setAttribute("page", page);
 		model.addAttribute("categoryId", categoryId);
+		
 		List<Board> boardList = boardService.selectArticleListByCategory(categoryId, page);
 		model.addAttribute("boardList", boardList);
+		
 		int bbsCount = boardService.selectTotalArticleCountByCategoryId(categoryId);
 		int totalPage = 0;
 		if(bbsCount > 0) {
 			totalPage= (int)Math.ceil(bbsCount/10.0);
 		}
+		
+		int totalPageBlock = (int)(Math.ceil(totalPage/10.0));
+		int nowPageBlock = (int)Math.ceil(page/10/0);
+		int startPage = (nowPageBlock-1)*10+1;
+		int endPage = 0;
+		if(totalPage > nowPageBlock*10) {
+			endPage = nowPageBlock*10;
+		}else {
+			endPage = totalPage;
+		}
+		
 		model.addAttribute("totalPageCount", totalPage);
-		model.addAttribute("page", page);
+		model.addAttribute("nowPage", page);
+		model.addAttribute("totalPageBlock", totalPageBlock);
+		model.addAttribute("nowPageBlock", nowPageBlock);
+		model.addAttribute("startPage", startPage);
+		model.addAttribute("endPage", endPage);
 		return "board/list";
 	}
 
