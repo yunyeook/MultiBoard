@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -62,9 +63,16 @@ public class BoardController {
 		return getListByCategory(categoryId, 1, session, model);
 	}
 	
-	@RequestMapping("/board/{boardId}/{page}")
+	@GetMapping("/board/{boardId}/{page}")
 	public String getBoardDetails(@PathVariable int boardId, @PathVariable int page, Model model) {
 		Board board = boardService.selectArticle(boardId);
+		String fileName=board.getFileName();
+		if(fileName!=null) {
+			int fileLength = fileName.length();
+			String fileType = fileName.substring(fileLength-4, fileLength).toUpperCase();
+			model.addAttribute("fileType",fileType);
+		}
+		
 		model.addAttribute("board", board);
 		model.addAttribute("page", page);
 		model.addAttribute("categoryId", board.getCategoryId());
