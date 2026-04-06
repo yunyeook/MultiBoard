@@ -10,8 +10,13 @@
 			<div class="row">
 				<div class="col-md-6 pc">
 					<h2>
+<<<<<<< HEAD
 						<span th:text="#{BOARD_LIST}">BOARD LIST</span><span></span>
 						<small style="color:red;" sec:authorize="isAnonymous()" th:text="#{LOGIN}"></small>
+=======
+						<span th:text="#{BOARD_LIST}">BOARD LIST</span>
+						<small style="color:red;" th:if="${session.email==null}" th:text="#{LOGIN}"></small>
+>>>>>>> b0e7d03e58ae9f2760b5eb7a4a214032230f5909
 					</h2>
 				</div>
 				<div class="col-md-6">
